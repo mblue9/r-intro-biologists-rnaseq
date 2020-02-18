@@ -8,7 +8,6 @@ output:
     toc_float: yes
 date: "`r format(Sys.time(), '%d %B %Y')`"
 ---
-Need to install R >= 3.6 for ttBulk, tidyHeatmap. Also need to install tidyverse, devtools, edgeR.
 
 # Acknowledgements
 This material is adapted from an R for RNA-seq workshop originally run [here](http://combine-australia.github.io/2016-05-11-RNAseq/).
@@ -17,29 +16,55 @@ This material is adapted from an R for RNA-seq workshop originally run [here](ht
   
 This course has been designed to introduce biologists to R for RNA-Seq analysis. The focus here is on using tidyverse to analyse RNA-seq data, as we believe this is a productive and engaging way to learn R for RNA-Seq analysis.
 
-# Intro to ttBulk package
+# Intro to ttBulk and tidyHeatmap packages
 
 #  <img src="images/ttbulk_logo.png" height="139px" width="120px" />
 
-In this course we will use the **ttBulk** package. [ttBulk]([https://github.com/stemangiola/ttBulk) is a new package that provides a friendly tidyverse-style way to perform analysis of RNA-Seq data.
+In this course we will use some new packages, [**ttBulk**]([https://github.com/stemangiola/ttBulk) and [**tidyHeatmap**](https://github.com/stemangiola/tidyHeatmap). These packages provide a friendly tidyverse-style way to perform analysis of RNA-Seq data.
 
-It will be added to Bioconductor (the home of many packages for the analysis of biological data) and when it is added there you can install it using the usual Bioconductor commands as described [here](https://www.bioconductor.org/install/).
+\  
+\  
+\  
 
-In the meantime you can install ttBulk from it's development site in Github with the command below. To run that command you will need the devtools package. If you don't already have it installed install it with install.packages("devtools"). 
+# R Packages
 
+Packages used:
+
+* tidyverse
+* ttBulk
+* tidyHeatmap
+* edgeR
+* devtools
+
+Here we will use packages from the 3 main repositories of R packages: Bioconductor, CRAN and GitHub. To install the packages you can:
+
+* [Install R >= 3.6](https://bioconductor.org/install/#install-R). **You must have R >= 3.6 to use ttBulk and tidyHeatmap.**
+
+## Bioconductor packages
+* Get the latest version of Bioconductor and edgeR package by starting R and entering the commands:
 ```{r, eval=FALSE}
-devtools::install_github("stemangiola/ttBulk@dev")
+if (!requireNamespace("BiocManager"))
+    install.packages("BiocManager")
+BiocManager::install("edgeR")
 ```
 
-\  
-\  
-\  
+## CRAN packages
+Install the CRAN packages with the command below.
+```{r, eval=FALSE}
+install.packages(c("tidyverse", "devtools"))
+```
 
-Set up working dir and/or use an RStudio project.
+## GitHub packages
+ttBulk will be added to Bioconductor and when it is added there you can install it using the usual Bioconductor commands. tidyHeatmap will be added to CRAN and when it is there you can install it with the install.packages() command. In the meantime you can install ttBulk and tidyHeatmap from their development sites in Github with the commands below.
 
-Workflow - test all commands will use first
+```{r, eval=FALSE}
+# install ttBulk
+devtools::install_github("stemangiola/ttBulk@dev")
 
-Open a new script for this workshop File > New File > R Script. Save it as e.g. rna-seq.R.
+# install tidyHeatmap
+devtools::install_github("stemangiola/tidyHeatmap")
+```
+
 
 # Overview
 
@@ -62,6 +87,7 @@ First, let’s load all the packages we will need to analyse the data.
 # load libraries
 library(tidyverse)
 library(ttBulk)
+library(tidyHeatmap)
 ```
 
 ## GREIN (GEO RNA-seq Experiments Interactive Navigator)
@@ -75,7 +101,7 @@ Here we will perform RNA-Seq analysis using data from the paper by [Fu et al. 20
 ## Reading in the data
 
 *Set up an RStudio project specifying the directory where you have saved the `/data` directory*.
-Download and read in the data.
+Open a new script for this workshop File > New File > R Script. Save it as e.g. intro-rnaseq.R.
 
 
 ```{r}
@@ -234,7 +260,7 @@ counts.norm %>%
 
 # Multidimensional scaling plots
 
-By far, one of the most important plots we make when we analyse RNA-Seq data are MDS plots. An MDS plot is a visualisation of a principle components analysis, which determines the greatest sources of variation in the data. A principle components analysis is an example of an unsupervised analysis, where we don't need to specify the groups. If your experiment is well controlled and has worked well, what we hope to see is that the greatest sources of variation in the data are the treatments/groups we are interested in. It is also an incredibly useful tool for quality control and checking for outliers. We can use the `reduce_dimensions()` function to calculate the dimensions.
+By far, one of the most important plots we make when we analyse RNA-Seq data are MDS plots. An MDS plot is a visualisation of a principal components analysis, which determines the greatest sources of variation in the data. A principle components analysis is an example of an unsupervised analysis, where we don't need to specify the groups. If your experiment is well controlled and has worked well, what we hope to see is that the greatest sources of variation in the data are the treatments/groups we are interested in. It is also an incredibly useful tool for quality control and checking for outliers. We can use the `reduce_dimensions()` function to calculate the dimensions.
 
 
 ```{r}
