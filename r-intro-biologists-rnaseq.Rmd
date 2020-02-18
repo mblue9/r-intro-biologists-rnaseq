@@ -8,7 +8,7 @@ output:
     toc_float: yes
 date: "`r format(Sys.time(), '%d %B %Y')`"
 ---
-Need to install R >= 3.6 for ttBulk, tidyHeatmap. Also need to install tidyverse, devtools, edgeR (maybe plotly).
+Need to install R >= 3.6 for ttBulk, tidyHeatmap. Also need to install tidyverse, devtools, edgeR.
 
 # Acknowledgements
 This material is adapted from an R for RNA-seq workshop originally run [here](http://combine-australia.github.io/2016-05-11-RNAseq/).
@@ -231,49 +231,6 @@ counts.norm %>%
   geom_hline(aes(yintercept = median(log2(`count scaled`+1)), colour = 'red'))
 ```
 
-Hierarchical clustering (maybe skip and leave for reading, and have heatmap of diff express genes instead)
-
-```{r eval=FALSE}
-library(gplots)
-
-# can get 500 most variable genes with
-counts.norm.variable = counts.norm %>% filter_variable()
-
-# need to convert to logCPM?
-
-# select just the columns needed
-high_var <- counts.norm.variable %>%
-  select(sample, gene_symbol,`count scaled`)
-
-# convert to wide format
-high_var <- high_var %>% pivot_wider(names_from=sample, values_from=`count scaled`)
-
-# convert to matrix
-high_var <- high_var %>%
-  as_matrix(rownames=gene_symbol) 
-
-#check columns are in order in sampleinfo, as if so use group info
-colnames(high_var)==sampleinfo$X1
-
-# set colours
-mycol <- colorpanel(1000,"blue","white","red")
-
-# create heatmap
-heatmap.2(high_var, col= mycol, labCol=sampleinfo$condition, trace="none", scale="row", dendrogram="column")
-```
-
-```{r eval=FALSE}
-#devtools::install_github("stemangiola/tidyHeatmap")
-library(tidyHeatmap)
-counts.norm.variable %>%
-    heatmap(
-        .horizontal = sample,
-        .vertical = gene_symbol,
-        .abundance = `count scaled`,
-        annotation = c(immunophenotype, `developmental stage`),
-        log_transform = TRUE
-    )
-```
 
 # Multidimensional scaling plots
 
@@ -454,15 +411,4 @@ counts.de %>%
     )
 ```
 
-Maybe include plotly
 
-```{r eval=FALSE}
-# make interactive
-library(plotly)
-counts.plot <- counts.de %>% 
-  filter(condition %in% c("bpreg", "blact")) %>%
-  select(logFC,PValue,gene_symbol,is_de)
-p <- ggplot(counts.plot, aes(x=logFC, y=-log10(PValue), colour=is_de, text=gene_symbol)) +
-  geom_point()
-ggplotly(p)
-```
