@@ -9,22 +9,25 @@ output:
 date: "`r format(Sys.time(), '%d %B %Y')`"
 ---
 
-# Acknowledgements
+## Acknowledgements
 This material is adapted from an R for RNA-seq workshop originally run [here](http://combine-australia.github.io/2016-05-11-RNAseq/).
   
 # R for RNA-seq course
   
-This course has been designed to introduce biologists to R for RNA-Seq analysis. The focus here is on using tidyverse to analyse RNA-seq data, as we believe this is a productive and engaging way to learn R for RNA-Seq analysis.
-
-# Intro to ttBulk and tidyHeatmap packages
+This course has been designed to introduce biologists to R for RNA-Seq analysis. The focus here is on using tidyverse to analyse RNA-seq data, as we believe this is a productive and engaging way to learn R for RNA-Seq analysis. In this course we will use some new packages, [**ttBulk**]([https://github.com/stemangiola/ttBulk) and [**tidyHeatmap**](https://github.com/stemangiola/tidyHeatmap). These packages provide a friendly tidyverse-style way to perform analysis of RNA-Seq data.
 
 #  <img src="images/ttbulk_logo.png" height="139px" width="120px" />
 
-In this course we will use some new packages, [**ttBulk**]([https://github.com/stemangiola/ttBulk) and [**tidyHeatmap**](https://github.com/stemangiola/tidyHeatmap). These packages provide a friendly tidyverse-style way to perform analysis of RNA-Seq data.
+# Data files
 
-\  
-\  
-\  
+Data files are available from the data folder in GitHub [here](https://github.com/mblue9/r-intro-biologists-rnaseq). 
+
+You should download the files listed below and place them into a folder called `data` in your working directory.
+
+Data files:
+
+* GSE60450_GeneLevel_Raw_data.csv
+* GSE60450_filtered_metadata.csv
 
 # R Packages
 
@@ -40,7 +43,7 @@ Here we will use packages from the 3 main repositories of R packages: Bioconduct
 
 * [Install R >= 3.6](https://bioconductor.org/install/#install-R). **You must have R >= 3.6 to use ttBulk and tidyHeatmap.**
 
-## Bioconductor packages
+### Bioconductor packages
 * Get the latest version of Bioconductor and edgeR package by starting R and entering the commands:
 ```{r, eval=FALSE}
 if (!requireNamespace("BiocManager"))
@@ -48,13 +51,13 @@ if (!requireNamespace("BiocManager"))
 BiocManager::install("edgeR")
 ```
 
-## CRAN packages
+### CRAN packages
 Install the CRAN packages with the command below.
 ```{r, eval=FALSE}
 install.packages(c("tidyverse", "devtools"))
 ```
 
-## GitHub packages
+### GitHub packages
 ttBulk will be added to Bioconductor and when it is added there you can install it using the usual Bioconductor commands. tidyHeatmap will be added to CRAN and when it is there you can install it with the install.packages() command. In the meantime you can install ttBulk and tidyHeatmap from their development sites in Github with the commands below.
 
 ```{r, eval=FALSE}
