@@ -1,24 +1,26 @@
 ---
-title: "Introduction to R for RNA-seq"
+title: "Introduction to R for RNA-Seq"
 author: "Maria Doyle"
 output:
   html_notebook:
     toc: yes
-    toc_depth: 3
+    toc_depth: 4
     toc_float: yes
 date: "`r format(Sys.time(), '%d %B %Y')`"
 ---
 
 ## Acknowledgements
-This material is adapted from an R for RNA-seq workshop originally run [here](http://combine-australia.github.io/2016-05-11-RNAseq/).
+This material is adapted from an R for RNA-Seq workshop originally run [here](http://combine-australia.github.io/2016-05-11-RNAseq/).
   
-# R for RNA-seq course
+# R for RNA-Seq course
   
-This course has been designed to introduce biologists to R for RNA-Seq analysis. The focus here is on using tidyverse to analyse RNA-seq data, as we believe this is a productive and engaging way to learn R for RNA-Seq analysis. In this course we will use some new packages, [**ttBulk**]([https://github.com/stemangiola/ttBulk) and [**tidyHeatmap**](https://github.com/stemangiola/tidyHeatmap). These packages provide a friendly tidyverse-style way to perform analysis of RNA-Seq data.
+This course has been designed to introduce biologists to R for RNA-Seq analysis. The focus here is on using tidyverse to analyse RNA-Seq data, as we believe this is a productive and engaging way to learn R for RNA-Seq analysis. In this course we will use some new packages, [**ttBulk**]([https://github.com/stemangiola/ttBulk) and [**tidyHeatmap**](https://github.com/stemangiola/tidyHeatmap). These packages provide a friendly tidyverse-style way to perform analysis of RNA-Seq data.
 
 #  <img src="images/ttbulk_logo.png" height="139px" width="120px" />
 
-# Data files
+# Setup
+
+## Data files
 
 Data files are available from the data folder in GitHub [here](https://github.com/mblue9/r-intro-biologists-rnaseq). You should download the files listed below and place them into a folder called `data` in your working directory.
 
@@ -27,7 +29,7 @@ Data files:
 * GSE60450_GeneLevel_Raw_data.csv
 * GSE60450_filtered_metadata.csv
 
-# R Packages
+## R Packages
 
 Packages used:
 
@@ -92,11 +94,11 @@ library(ttBulk)
 library(tidyHeatmap)
 ```
 
-## GREIN (GEO RNA-seq Experiments Interactive Navigator)
-In this tutorial, we will learn some R through creating plots to visualise data from an RNA-seq experiment. RNA-seq counts file can be obtained from the [GREIN platform](https://www.nature.com/articles/s41598-019-43935-8). GREIN provides >6,500 published datasets from GEO that have been uniformly processed. It is available at http://www.ilincs.org/apps/grein/. You can search for a dataset of interest using the GEO code. We obtained the dataset used here using the code GSE60450. GREIN provide QC metrics for the RNA-seq datasets and both raw and normalized counts. We will use the raw counts here. Generally, the higher the number of counts the more the gene is expressed.
+## GREIN repository of RNA-Seq datasets
+In this tutorial, we will learn some R through creating plots to visualise data from an RNA-Seq experiment. RNA-Seq counts file can be obtained from the [GREIN platform](https://www.nature.com/articles/s41598-019-43935-8). GREIN stands for GEO RNA-Seq Experiments Interactive Navigator and provides >6,500 published datasets from GEO that have been uniformly processed. It is available at http://www.ilincs.org/apps/grein/. You can search for a dataset of interest using the GEO code. We obtained the dataset used here using the code GSE60450. GREIN provide QC metrics for the RNA-Seq datasets and both raw and normalised counts. We will use the raw counts here. Generally, the higher the number of counts the more the gene is expressed.
 
-## RNA-seq dataset
-Here we will perform RNA-Seq analysis using data from the paper by [Fu et al. 2015](https://www.ncbi.nlm.nih.gov/pubmed/25730472), GEO code GSE60450. This study examined expression in basal and luminal cells from mice at different stages (virgin, pregnant and lactating). There are 2 samples per group and 6 groups, 12 samples in total.
+## Mouse mammary gland dataset
+Here we will perform RNA-Seq analysis using data from a breast cancer research study, from the paper by [Fu et al. 2015](https://www.ncbi.nlm.nih.gov/pubmed/25730472), GEO code GSE60450. This study examined gene expression in basal and luminal cells from mice at different stages of mammary gland development (virgin, pregnant and lactating). There are 2 samples per group and 6 groups, 12 samples in total.
 
 ![](images/mouse_exp.png)
 
@@ -200,9 +202,9 @@ Genes with very low counts across all libraries provide little evidence for diff
 
 There are a few ways to filter out lowly expressed genes. When there are biological replicates in each group, in this case we have a sample size of 2 in each group, we favour filtering on a minimum counts per million threshold present in at least 2 samples. Two represents the smallest sample size for each group in our experiment. In this dataset, we choose to retain genes if they are expressed at a counts-per-million (CPM) above 0.5 in at least two samples. A CPM of 0.5 is used as it corresponds to a count of 10-15 for the library sizes in this data set. If the count is any smaller, it is considered to be very low, indicating that the associated gene is not expressed in that sample. A requirement for expression in two or more libraries is used as each group contains two replicates. This ensures that a gene will be retained if it is only expressed in one group. Smaller CPM thresholds are usually appropriate for larger libraries. As a general rule, a good threshold can be chosen by identifying the CPM that corresponds to a count of 10, which in this case is about 0.5. You should filter with CPMs rather than filtering on the counts directly, as the latter does not account for differences in library sizes between samples.
 
-### Normalization for sequencing depth and composition
+### Normalisation for sequencing depth and composition
 
-TMM normalization is performed to eliminate composition biases between libraries [@robinson2010tmm]. This generates a set of normalization factors, where the product of these factors and the library sizes defines the effective library size. TMM normalisation (and most scaling normalisation methods) scale relative to one sample.
+TMM normalisation is performed to eliminate composition biases between libraries [@robinson2010tmm]. This generates a set of normalisation factors, where the product of these factors and the library sizes defines the effective library size. TMM normalisation (and most scaling normalisation methods) scale relative to one sample.
 
 In the ttBulk package the function scale_abundance() performs the filtering and normalisation to generate normalised counts.
 
@@ -262,7 +264,7 @@ counts.norm %>%
 
 # Multidimensional scaling plots
 
-By far, one of the most important plots we make when we analyse RNA-Seq data are MDS plots. An MDS plot is a visualisation of a principal components analysis, which determines the greatest sources of variation in the data. A principle components analysis is an example of an unsupervised analysis, where we don't need to specify the groups. If your experiment is well controlled and has worked well, what we hope to see is that the greatest sources of variation in the data are the treatments/groups we are interested in. It is also an incredibly useful tool for quality control and checking for outliers. We can use the `reduce_dimensions()` function to calculate the dimensions.
+By far, one of the most important plots we make when we analyse RNA-Seq data are MDS plots. An MDS plot is a visualisation of a principal components analysis, which determines the greatest sources of variation in the data. A principal components analysis is an example of an unsupervised analysis, where we don't need to specify the groups. If your experiment is well controlled and has worked well, what we hope to see is that the greatest sources of variation in the data are the treatments/groups we are interested in. It is also an incredibly useful tool for quality control and checking for outliers. We can use the `reduce_dimensions()` function to calculate the dimensions.
 
 
 ```{r}
@@ -374,6 +376,8 @@ write_tsv(counts.de, "my_de_results.tsv")
 
 Let's make a few plots to make sure everything looks good and that we haven't made a mistake in the analysis. Genome-wide plots that are useful for checking are MA plots and volcano plots. We can also use stripcharts and heatmaps to visualise groups of genes.
 
+### MA plots
+
 MA plots enable us to visualise **amount** of expression (logCPM) versus logFC. Highly expressed genes are towards the right of the plot. We can also colour significant genes (e.g. genes with FDR < 0.05) 
 
 ```{r}
@@ -384,6 +388,7 @@ counts.de %>%
   geom_point()
 # colour by logfc & set up to red, down to blue
 ```
+### Volcano plots
 
 Volcano plots enable us to visualise **significance** of expression (logCPM) versus logFC. Highly significant genes are towards the top of the plot. We can also colour significant genes (e.g. genes with FDR < 0.05) 
 
@@ -395,6 +400,9 @@ counts.de %>%
   geom_point()
 # colour by logfc & set up to red, down to blue, highlight some genes
 ```
+
+### Stripcharts
+
 Need to join the scaled counts to the de results to plot normalised counts per gene.
 ```{r}
 counts.de <- full_join(counts.de, counts.norm)
@@ -408,11 +416,11 @@ counts.de %>%
 	geom_jitter() +
 	facet_wrap(~gene_symbol)
 ```
+### Heatmaps
+
+We can create heatmap for the most differentially expressed genes.
 
 ```{r fig.height=5, fig.width=8}
-# heatmap of DE genes
-library(tidyHeatmap)
-
 # basic
 counts.de %>%
   filter(FDR < 0.05 & abs(logFC) > 4) %>%
@@ -440,13 +448,13 @@ counts.de %>%
 ```
 
 # Key Points
-- RNA-seq data can be analysed in a 'tidy' way using the packages ttBulk and tidyHeatmap
-- Key steps in an RNA-seq analysis are filtering lowly expressed genes, normalisation for sequencing depth and composition, and testing for differential expression
+- RNA-Seq data can be analysed in a 'tidy' way using the packages tidyverse, ttBulk and tidyHeatmap
+- Key steps in an RNA-Seq analysis are filtering lowly expressed genes, normalisation for sequencing depth and composition, and testing for differential expression
 - MDS plots are very important for examining the quality of the data
-- Other useful plots for assessing RNA-seq data are density plots, box plots, MA plots, volcano plots, stripcharts and heatmaps
+- Other useful plots for assessing RNA-Seq data are bar plots, density plots, box plots, MA plots, volcano plots, stripcharts and heatmaps
 
 
 # Further Reading
-[RNA-seq analysis is easy as 1-2-3 with limma, Glimma and edgeR](https://f1000research.com/articles/5-1408)
-[RNA-seq analysis in R](http://combine-australia.github.io/RNAseq-R/06-rnaseq-day1.html)
+[RNA-Seq analysis is easy as 1-2-3 with limma, Glimma and edgeR](https://f1000research.com/articles/5-1408) 
+[RNA-Seq analysis in R](http://combine-australia.github.io/RNAseq-R/06-rnaseq-day1.html)
 
