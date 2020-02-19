@@ -20,9 +20,7 @@ This course has been designed to introduce biologists to R for RNA-Seq analysis.
 
 # Data files
 
-Data files are available from the data folder in GitHub [here](https://github.com/mblue9/r-intro-biologists-rnaseq). 
-
-You should download the files listed below and place them into a folder called `data` in your working directory.
+Data files are available from the data folder in GitHub [here](https://github.com/mblue9/r-intro-biologists-rnaseq). You should download the files listed below and place them into a folder called `data` in your working directory.
 
 Data files:
 
@@ -39,8 +37,9 @@ Packages used:
 * edgeR
 * devtools
 
-Here we will use packages from the 3 main repositories of R packages: Bioconductor, CRAN and GitHub. To install the packages you can:
+Here we will use packages from the 3 main repositories of R packages: Bioconductor, CRAN and GitHub. To install the packages you can follow the steps below.
 
+### R version
 * [Install R >= 3.6](https://bioconductor.org/install/#install-R). **You must have R >= 3.6 to use ttBulk and tidyHeatmap.**
 
 ### Bioconductor packages
@@ -440,4 +439,14 @@ counts.de %>%
     )
 ```
 
+# Key Points
+- RNA-seq data can be analysed in a 'tidy' way using the packages ttBulk and tidyHeatmap
+- Key steps in an RNA-seq analysis are filtering lowly expressed genes, normalisation for sequencing depth and composition, and testing for differential expression
+- MDS plots are very important for examining the quality of the data
+- Other useful plots for assessing RNA-seq data are density plots, box plots, MA plots, volcano plots, stripcharts and heatmaps
+
+
+# Further Reading
+[RNA-seq analysis is easy as 1-2-3 with limma, Glimma and edgeR](https://f1000research.com/articles/5-1408)
+[RNA-seq analysis in R](http://combine-australia.github.io/RNAseq-R/06-rnaseq-day1.html)
 
