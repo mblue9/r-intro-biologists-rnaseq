@@ -341,6 +341,26 @@ ggplot(MDSdims, aes(x=Dim1, y=Dim2, colour=`developmental stage`, shape=immunoph
 
 Demo more MDS plots (sample swap, batch effects)
 
+# Hierarchical clustering with heatmaps
+
+An alternative to MDS for examining relationships between samples is using hierarchical clustering. Heatmaps are a nice visualisation to examine hierarchical clustering of your samples. ttBulk has a simple function we can use to extract the 500 most variable genes which we can then plot with tidyHeatmap.
+
+```{r fig.height=5, fig.width=8}
+# extract 500 most variable genes
+counts.norm.variable <- counts.norm %>% 
+  filter_variable()
+
+# create heatmap
+counts.norm.variable %>%
+  heatmap(
+        .horizontal = sample,
+        .vertical = gene_symbol,
+        .abundance = `count scaled`,
+        annotation = c(immunophenotype, `developmental stage`),
+        log_transform = TRUE
+    )
+```
+
 # Differential expression
 
 Now that we are happy that the data looks good, we can continue to testing for differentially expressed genes. We will use the `test_differential_abundance()` from ttBulk which uses edgeR to perform the differential expression analysis. We give `test_differential_abundance()` our ttBulk counts object, our filtering thresholds and a formula (e.g. `0 + condition`), 
@@ -352,7 +372,8 @@ counts.de <- counts %>%
       .formula = ~ 0 + condition,
       .contrasts = c("conditionbpreg - conditionblact"),
       cpm_threshold = 0.5,
-      prop_threshold = 2/12)
+      prop_threshold = 2/12,
+      action="get")
 # take a look
 counts.de
 ```
@@ -465,6 +486,13 @@ counts.de %>%
     )
 ```
 
+# Reproducibility 
+Record package and version information with `sessionInfo()`
+
+```{r}
+sessionInfo()
+```
+
 # Key Points
 - RNA-Seq data can be analysed in a 'tidy' way using the packages tidyverse, ttBulk and tidyHeatmap
 - Key steps in an RNA-Seq analysis are filtering lowly expressed genes, normalisation for sequencing depth and composition, and testing for differential expression
@@ -473,6 +501,6 @@ counts.de %>%
 
 
 # Further Reading
-[RNA-Seq analysis is easy as 1-2-3 with limma, Glimma and edgeR](https://f1000research.com/articles/5-1408) 
+[RNA-Seq analysis is easy as 1-2-3 with limma, Glimma and edgeR](https://f1000research.com/articles/5-1408)  
 [RNA-Seq analysis in R](http://combine-australia.github.io/RNAseq-R/06-rnaseq-day1.html)
 
