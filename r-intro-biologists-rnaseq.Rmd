@@ -173,6 +173,12 @@ counts <- full_join(counts, sampleinfo, by = c("sample" = "X1"))
 # take a look
 counts
 ```
+We can shorten the sample names. We can remove the GSM1480 prefix that's present in all of them as shorter names can fit better in some of the plots we will create. We can use `mutate()` together with `str_replace()` to remove the GSM1480 string from the sample column.
+
+```{r}
+counts <- counts %>% 
+  mutate(sample=str_remove(sample, "GSM1480"))
+```
 
 Now that we have our data in the format we want we will create a tidyBulk object, that we can use to perform differential expression analysis with the tidyBulk package. For this we need to specify our counts object and the names of the columns that contain our sample ids, our gene identifiers and our counts. Any other columns in the counts object e.g. our Ensembl gene id "X1" column will remain at the end.
 ```{r}
@@ -234,8 +240,9 @@ We can create density plots to view the distributions of the counts for the samp
 ```{r}
 # density plot before 
 counts.norm %>% 
-    ggplot(aes(x=log2(`count scaled` + 1), group=sample, color=condition)) +
-    geom_density()
+    ggplot(aes(x=`count scaled` + 1, group=sample, color=condition)) +
+    geom_density() +
+  scale_x_log10()
 ```
 The large peak on the left of the plot shows that a large proportion of genes within each sample are not expressed or lowly-expressed.
 
