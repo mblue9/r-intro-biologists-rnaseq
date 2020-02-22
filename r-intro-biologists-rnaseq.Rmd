@@ -231,7 +231,7 @@ counts.norm <- counts %>% scale_abundance(
 counts.norm
 ```
 
-After we run scale_abundance() we should see some columns have been added to the end of counts. We have a column called `filter out low counts` that indicates whether the gene has been filtered due to being lowly expressed, FALSE means it wasn't filtered, TRUE means it was. The `count scaled` column contains the scaled counts, after the normalisation has been applied.
+After we run scale_abundance() we should see some columns have been added to the end of counts. We have a column called `lowly_abundant` that indicates whether the gene has been filtered due to being lowly expressed, FALSE means it wasn't filtered, TRUE means it was. The `count_scaled` column contains the scaled counts, after the normalisation has been applied.
 
 *Maybe add a way to see how many genes we have for each sample, before and after filtering?*
 
@@ -240,7 +240,7 @@ We can create density plots to view the distributions of the counts for the samp
 ```{r}
 # density plot before 
 counts.norm %>% 
-    ggplot(aes(x=`count scaled` + 1, group=sample, color=condition)) +
+    ggplot(aes(x=count_scaled + 1, group=sample, color=condition)) +
     geom_density() +
   scale_x_log10()
 ```
@@ -252,8 +252,8 @@ Adapt the code above to create a density plot of the counts after filtering lowl
 ```{r}
 # Solution
 counts.norm %>% 
-  filter(`filter out low counts` == FALSE) %>%
-    ggplot(aes(x=log2(`count scaled`+1), group=sample, color=condition)) +
+  filter(lowly_abundant == FALSE) %>%
+    ggplot(aes(x=log2(count_scaled +1), group=sample, color=condition)) +
     geom_density()
 ```
 
@@ -262,7 +262,7 @@ We can also create box plots to check the distributions of the counts in the sam
 ```{r}
 # box plot before scaling
 counts.norm %>% 
-  filter(`filter out low counts` == FALSE) %>%
+  filter(lowly_abundant == FALSE) %>%
     ggplot(aes(x=sample, y=log2(count+1), fill=condition)) +
     geom_boxplot() +
   geom_hline(aes(yintercept = median(log2(count+1)), colour = 'red'))
@@ -274,10 +274,10 @@ Adapt the code above to create box plots that only includes the genes that have 
 ```{r}
 # box plot after filtering
 counts.norm %>% 
-  filter(`filter out low counts` == FALSE) %>%
-    ggplot(aes(x=sample, y=log2(`count scaled`+1), fill=condition)) +
+  filter(lowly_abundant == FALSE) %>%
+    ggplot(aes(x=sample, y=log2(count_scaled + 1), fill=condition)) +
     geom_boxplot() +
-  geom_hline(aes(yintercept = median(log2(`count scaled`+1)), colour = 'red'))
+  geom_hline(aes(yintercept = median(log2(count_scaled + 1)), colour = 'red'))
 ```
 
 # Multidimensional scaling plots
@@ -362,7 +362,7 @@ counts.norm.variable %>%
   heatmap(
         .horizontal = sample,
         .vertical = gene_symbol,
-        .abundance = `count scaled`,
+        .abundance = count_scaled,
         annotation = c(immunophenotype, `developmental stage`),
         log_transform = TRUE
     )
@@ -425,7 +425,7 @@ MA plots enable us to visualise **amount** of expression (logCPM) versus logFC. 
 ```{r}
 # maplot, minimal
 counts.de %>%
-  filter(`filter out low counts` == FALSE) %>%
+  filter(lowly_abundant == FALSE) %>%
   ggplot(aes(x=logCPM, y=-logFC, colour=is_de)) +
   geom_point()
 ```
@@ -436,7 +436,7 @@ Volcano plots enable us to visualise **significance** of expression (logCPM) ver
 ```{r}
 # volcanoplot, minimal
 counts.de %>%
-  filter(`filter out low counts` == FALSE) %>%
+  filter(lowly_abundant == FALSE) %>%
   ggplot(aes(x=logFC, y=-log10(PValue), colour=is_de)) +
   geom_point()
 ```
@@ -457,7 +457,7 @@ With stripcharts we can see if replicates tend to group together and how the exp
 # stripcharts
 counts.de %>%
 	inner_join( (.) %>% distinct(gene_symbol, PValue) %>% arrange(PValue) %>% head(6)) %>%
-	ggplot(aes(x = condition, y = log2(`count scaled` + 1), colour = condition)) +
+	ggplot(aes(x = condition, y = log2(count_scaled + 1), colour = condition)) +
 	geom_jitter() +
 	facet_wrap(~gene_symbol)
 ```
@@ -473,7 +473,7 @@ counts.de %>%
   heatmap(
         .horizontal = sample,
         .vertical = gene_symbol,
-        .abundance = `count scaled`,
+        .abundance = count_scaled,
         annotation = c(immunophenotype, `developmental stage`),
         log_transform = TRUE
     )
@@ -485,7 +485,7 @@ counts.de %>%
   heatmap(
         .horizontal = sample,
         .vertical = gene_symbol,
-        .abundance = `count scaled`,
+        .abundance = count_scaled,
         annotation = c(immunophenotype, `developmental stage`),
         log_transform = TRUE,
         palette_abundance = c("blue", "white", "red"),
