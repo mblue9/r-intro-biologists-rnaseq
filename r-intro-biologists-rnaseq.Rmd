@@ -235,13 +235,13 @@ After we run scale_abundance() we should see some columns have been added to the
 
 *Maybe add a way to see how many genes we have for each sample, before and after filtering?*
 
-We can create density plots to view the distributions of the counts for the samples before and after filtering. This is also a quality check to see if the samples look similar and that none look majorly different. Note we need to take the log2 of the counts and add a small offset (1) to avoid taking log of zero.
+We can create density plots to view the distributions of the counts for the samples before and after filtering. This is also a quality check to see if the samples look similar and that none look majorly different. Note we need to log the counts which we can do by using `scale_x_log10()` We need to add a small offset (1) to the counts to avoid taking log of zero.
 
 ```{r}
 # density plot before 
 counts.norm %>% 
-    ggplot(aes(x=count_scaled + 1, group=sample, color=condition)) +
-    geom_density() +
+  ggplot(aes(x=count_scaled + 1, group=sample, color=condition)) +
+  geom_density() +
   scale_x_log10()
 ```
 The large peak on the left of the plot shows that a large proportion of genes within each sample are not expressed or lowly-expressed.
@@ -253,8 +253,9 @@ Adapt the code above to create a density plot of the counts after filtering lowl
 # Solution
 counts.norm %>% 
   filter(lowly_abundant == FALSE) %>%
-    ggplot(aes(x=log2(count_scaled +1), group=sample, color=condition)) +
-    geom_density()
+  ggplot(aes(x=count_scaled + 1, group=sample, color=condition)) +
+  geom_density() +
+  scale_x_log10()
 ```
 
 We can also create box plots to check the distributions of the counts in the samples. We can add a line through the median to help us see how similar (or not) the distributions are.
@@ -263,9 +264,10 @@ We can also create box plots to check the distributions of the counts in the sam
 # box plot before scaling
 counts.norm %>% 
   filter(lowly_abundant == FALSE) %>%
-    ggplot(aes(x=sample, y=log2(count+1), fill=condition)) +
-    geom_boxplot() +
-  geom_hline(aes(yintercept = median(log2(count+1)), colour = 'red'))
+  ggplot(aes(x=sample, y=count+1, fill=condition)) +
+  geom_boxplot() +
+  geom_hline(aes(yintercept = median(count+1), colour = 'red')) +
+  scale_y_log10()
 ```
 
 #### Exercise
@@ -275,9 +277,10 @@ Adapt the code above to create box plots that only includes the genes that have 
 # box plot after filtering
 counts.norm %>% 
   filter(lowly_abundant == FALSE) %>%
-    ggplot(aes(x=sample, y=log2(count_scaled + 1), fill=condition)) +
-    geom_boxplot() +
-  geom_hline(aes(yintercept = median(log2(count_scaled + 1)), colour = 'red'))
+  ggplot(aes(x=sample, y=count_scaled + 1, fill=condition)) +
+  geom_boxplot() +
+  geom_hline(aes(yintercept = median(count_scaled + 1), colour = 'red')) +
+  scale_y_log10()
 ```
 
 # Multidimensional scaling plots
@@ -457,9 +460,10 @@ With stripcharts we can see if replicates tend to group together and how the exp
 # stripcharts
 counts.de %>%
 	inner_join( (.) %>% distinct(gene_symbol, PValue) %>% arrange(PValue) %>% head(6)) %>%
-	ggplot(aes(x = condition, y = log2(count_scaled + 1), colour = condition)) +
+	ggplot(aes(x = condition, y = count_scaled + 1, colour = condition)) +
 	geom_jitter() +
-	facet_wrap(~gene_symbol)
+	facet_wrap(~gene_symbol) +
+  scale_y_log10()
 ```
 
 ### Heatmaps
