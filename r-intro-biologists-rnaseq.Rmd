@@ -1,6 +1,6 @@
 ---
 title: "Introduction to R for RNA-Seq"
-author: "Maria Doyle"
+author: "Maria Doyle, Stefano Mangiola"
 output:
   html_notebook:
     toc: yes
@@ -10,7 +10,7 @@ date: "`r format(Sys.time(), '%d %B %Y')`"
 ---
 
 ## Acknowledgements
-This material is adapted from an R for RNA-Seq workshop originally run [here](http://combine-australia.github.io/2016-05-11-RNAseq/).
+This material is adapted from an R for RNA-Seq workshop first run [here](http://combine-australia.github.io/2016-05-11-RNAseq/).
   
 # R for RNA-Seq course
   
