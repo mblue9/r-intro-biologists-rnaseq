@@ -16,7 +16,7 @@ This material is adapted from an R for RNA-Seq workshop first run [here](http://
   
 This course has been designed to introduce biologists to R for RNA-Seq analysis. The focus here is on using tidyverse to analyse RNA-Seq data, as we believe this is a productive and engaging way to learn R for RNA-Seq analysis. In this course we will use some new packages, [**tidyBulk**]([https://github.com/stemangiola/tidyBulk) and [**tidyHeatmap**](https://github.com/stemangiola/tidyHeatmap). These packages provide a friendly tidyverse-style way to perform analysis of RNA-Seq data.
 
-#  <img src="images/tidyBulk_logo.png" height="139px" width="120px" />
+![](images/tidyBulk_logo.png){width=25% }
 
 # Setup
 
