@@ -340,27 +340,13 @@ counts.de
 Now we have columns with our logFC and FDR P values.
 
 #### Exercise
-Perform differential expression for lpreg vs llact
+Perform differential expression for lpreg vs llact. Don't save over `counts.de`, save as `counts.de2`.
 
-Perform for 2 contrasts, bpreg vs blact and lpreg vs llact at the same time
+Perform for 2 contrasts, bpreg vs blact and lpreg vs llact at the same time. Don't save over `counts.de`, save as `counts.de3`.
 
-```{r}
-# maybe include
-# remove condition from column names
-# counts.de <- counts.de %>% 
-#  rename_at(vars(contains("condition")), ~ str_replace(., "_condition", ""))
-```
+## Table of differentially expressed genes
 
-We can take a look at the top genes by P value. We can use `filter()` to select only genes with FDR < 0.05, then use `distinct()` to get the unique values for columns of interest, and `arrange()` to sort the table by PValue.
-
-```{r eval=FALSE}
-counts.de %>%
-  filter(FDR < 0.05) %>%
-  distinct(gene_symbol, logFC, PValue, FDR) %>%
-  arrange(PValue)
-```
-
-We can write out our results to a file that can be loaded into e.g. Excel. `write_tsv()` will create a tab-separated file.
+We can write out our differentialy expressed genes to a file that can be loaded into e.g. Excel. `write_tsv()` will create a tab-separated file.
 
 ```{r eval=FALSE}
 # save results
