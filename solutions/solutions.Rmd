@@ -1,0 +1,86 @@
+---
+title: "Introduction to R for RNA-Seq: Solutions"
+output: html_notebook
+---
+
+#### Exercise
+Adapt the code above to create a density plot of the counts after filtering lowly expressed genes. How does it compare it to the density plot above?
+
+```{r}
+# Solution
+counts.norm %>% 
+  filter(lowly_abundant == FALSE) %>%
+  ggplot(aes(x=count_scaled + 1, group=sample, color=condition)) +
+  geom_density() +
+  scale_x_log10()
+```
+
+#### Exercise
+Adapt the code above to create box plots that only includes the genes that have not been filtered due to low counts. How does it compare it to the box plots above?
+
+```{r}
+# box plot after filtering
+counts.norm %>% 
+  filter(lowly_abundant == FALSE) %>%
+  ggplot(aes(x=sample, y=count_scaled + 1, fill=condition)) +
+  geom_boxplot() +
+  geom_hline(aes(yintercept = median(count_scaled + 1), colour = 'red')) +
+  scale_y_log10()
+```
+
+
+#### Exercise 
+Colour the MDS plot with different metadata variables e.g. immunophenotype. 
+Try using `shape=` inside the aes(). You can use ?geom_point to check the help page.
+Discuss what is the greatest source of variation in the data (i.e. what does dimension 1 represent)? What is the second greatest source of variation in the data?
+
+Solution
+```{r}
+# MDS plot coloured by cell type
+ggplot(MDSdims, aes(x=Dim1, y=Dim2, colour=condition)) + 
+  geom_point()
+```
+
+
+```{r}
+# MDS plot coloured by cell type
+ggplot(MDSdims, aes(x=Dim1, y=Dim2, colour=immunophenotype)) + 
+  geom_point()
+```
+
+```{r}
+# MDS plot coloured by stage
+ggplot(MDSdims, aes(x=Dim1, y=Dim2, colour=`developmental stage`)) + 
+  geom_point()
+```
+
+
+
+```{r}
+# MDS plot coloured by stage with shape for cell type
+ggplot(MDSdims, aes(x=Dim1, y=Dim2, colour=`developmental stage`, shape=immunophenotype)) + 
+  geom_point()
+```
+
+
+#### Exercise
+Perform differential expression for lpreg vs llact
+Perform for 2 contrasts, bpreg vs blact and lpreg vs llact at the same time
+
+#### Exercise
+
+Create a heatmap for genes with FDR < 0.01 and abs(logFC) > 2
+
+```{r}
+counts.de %>%
+  filter(FDR < 0.01 & abs(logFC) > 1) %>%
+  heatmap(
+        .horizontal = sample,
+        .vertical = gene_symbol,
+        .abundance = count_scaled,
+        annotation = c(immunophenotype, `developmental stage`),
+        log_transform = TRUE,
+        palette_abundance = c("blue", "white", "red"),
+        column_names_gp = gpar(fontsize = 8)
+    )
+```

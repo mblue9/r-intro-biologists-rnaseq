@@ -223,9 +223,7 @@ In the tidyBulk package the function scale_abundance() performs the filtering an
 
 ```{r}
 # Normalisation for library size and composition bias (scale counts), 
-counts.norm <- counts %>% scale_abundance(
-  cpm_threshold = 0.5,
-  prop_threshold = 2/12)
+counts.norm <- counts %>% scale_abundance()
 
 # take a look
 counts.norm
@@ -249,15 +247,6 @@ The large peak on the left of the plot shows that a large proportion of genes wi
 #### Exercise
 Adapt the code above to create a density plot of the counts after filtering lowly expressed genes. How does it compare it to the density plot above?
 
-```{r}
-# Solution
-counts.norm %>% 
-  filter(lowly_abundant == FALSE) %>%
-  ggplot(aes(x=count_scaled + 1, group=sample, color=condition)) +
-  geom_density() +
-  scale_x_log10()
-```
-
 We can also create box plots to check the distributions of the counts in the samples. We can add a line through the median to help us see how similar (or not) the distributions are.
 
 ```{r}
@@ -270,18 +259,6 @@ counts.norm %>%
   scale_y_log10()
 ```
 
-#### Exercise
-Adapt the code above to create box plots that only includes the genes that have not been filtered due to low counts. How does it compare it to the box plots above?
-
-```{r}
-# box plot after filtering
-counts.norm %>% 
-  filter(lowly_abundant == FALSE) %>%
-  ggplot(aes(x=sample, y=count_scaled + 1, fill=condition)) +
-  geom_boxplot() +
-  geom_hline(aes(yintercept = median(count_scaled + 1), colour = 'red')) +
-  scale_y_log10()
-```
 
 # Multidimensional scaling plots
 
@@ -323,31 +300,6 @@ Colour the MDS plot with different metadata variables e.g. immunophenotype.
 Try using `shape=` inside the aes(). You can use ?geom_point to check the help page.
 Discuss what is the greatest source of variation in the data (i.e. what does dimension 1 represent)? What is the second greatest source of variation in the data?
 
-Solution
-
-```{r}
-# MDS plot coloured by cell type
-ggplot(MDSdims, aes(x=Dim1, y=Dim2, colour=condition)) + 
-  geom_point()
-```
-
-```{r}
-# MDS plot coloured by cell type
-ggplot(MDSdims, aes(x=Dim1, y=Dim2, colour=immunophenotype)) + 
-  geom_point()
-```
-
-```{r}
-# MDS plot coloured by stage
-ggplot(MDSdims, aes(x=Dim1, y=Dim2, colour=`developmental stage`)) + 
-  geom_point()
-```
-
-```{r}
-# MDS plot coloured by stage with shape for cell type
-ggplot(MDSdims, aes(x=Dim1, y=Dim2, colour=`developmental stage`, shape=immunophenotype)) + 
-  geom_point()
-```
 
 Demo more MDS plots (sample swap, batch effects)
 
@@ -381,8 +333,6 @@ counts.de <- counts %>%
     test_differential_abundance(
       .formula = ~ 0 + condition,
       .contrasts = c("conditionbpreg - conditionblact"),
-      cpm_threshold = 0.5,
-      prop_threshold = 2/12,
       action="get")
 # take a look
 counts.de
@@ -429,7 +379,7 @@ MA plots enable us to visualise **amount** of expression (logCPM) versus logFC. 
 # maplot, minimal
 counts.de %>%
   filter(lowly_abundant == FALSE) %>%
-  ggplot(aes(x=logCPM, y=-logFC, colour=is_de)) +
+  ggplot(aes(x=`logCPM_conditionbpreg - conditionblact`, y=-`logFC_conditionbpreg - conditionblact`, colour=`is_de_conditionbpreg - conditionblact`)) +
   geom_point()
 ```
 ### Volcano plots
@@ -440,7 +390,7 @@ Volcano plots enable us to visualise **significance** of expression (logCPM) ver
 # volcanoplot, minimal
 counts.de %>%
   filter(lowly_abundant == FALSE) %>%
-  ggplot(aes(x=logFC, y=-log10(PValue), colour=is_de)) +
+  ggplot(aes(x=`logFC_conditionbpreg - conditionblact`, y=-log10(`PValue_conditionbpreg - conditionblact`), colour=`is_de_conditionbpreg - conditionblact`)) +
   geom_point()
 ```
 To see how to make more complicated volcano plots, including how to label genes in the plot, see the volcano plot tutorial [here](https://pmacdasci.github.io/r-intro-tidyverse/volcanoplot.html). More complicated MA plots could also be made in a similar way.
