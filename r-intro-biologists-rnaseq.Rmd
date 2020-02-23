@@ -406,7 +406,7 @@ In addition to the genome-wide plots already discussed, it is recommended to hav
 
 For these plots showing expression in the individual samples, we need the normalised counts per gene per sample, so we will first join the scaled counts to the de results.
 ```{r}
-counts.de <- full_join(counts.de, counts.norm)
+counts.de <- full_join(counts.de, counts.norm, by = "gene_symbol")
 ```
 With stripcharts we can see if replicates tend to group together and how the expression compares to the other groups. 
 *Note this is bit more complicated maybe omit. Or break it into steps e.g. get top genes, then plot*
