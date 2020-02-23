@@ -337,7 +337,7 @@ counts.de <- counts %>%
 # take a look
 counts.de
 ```
-Now we have columns with our logFC and FDR P values.
+Now we have columns with our logFC and FDR P values. There is also an is_de column that indicates if the gene has FDR < 0.05.
 
 #### Exercise
 Perform differential expression for lpreg vs llact. Don't save over `counts.de`, save as `counts.de2`.
@@ -350,8 +350,27 @@ We can write out our differentialy expressed genes to a file that can be loaded 
 
 ```{r eval=FALSE}
 # save results
-write_tsv(counts.de, "my_de_results.tsv")
+write_tsv(counts.de, "de_results_bpreg_vs_blact.tsv")
 ```
+
+We only have one contrast here so we can remove the suffix `_conditionbpreg - conditionblact` from the column headers, to make the names shorter to use in the rest of the commands here.
+
+```{r}
+counts.de <- counts.de %>%
+  rename_at(vars(contains("condition")),
+            ~str_replace(., "_conditionbpreg - conditionblact", ""))
+```
+
+We can count how many differentially expressed genes there are using the is_de column.
+
+```{r}
+counts.de %>% filter(is_de == TRUE) %>% 
+  n_distinct()
+```
+
+#### Exercise
+Count how many upregulated DE genes there are. 
+Count how many downregulated DE genes there are.
 
 # Plots after testing for DE
 
@@ -365,7 +384,7 @@ MA plots enable us to visualise **amount** of expression (logCPM) versus logFC. 
 # maplot, minimal
 counts.de %>%
   filter(lowly_abundant == FALSE) %>%
-  ggplot(aes(x=`logCPM_conditionbpreg - conditionblact`, y=-`logFC_conditionbpreg - conditionblact`, colour=`is_de_conditionbpreg - conditionblact`)) +
+  ggplot(aes(x=logCPM, y=-logFC, colour=is_de)) +
   geom_point()
 ```
 ### Volcano plots
@@ -376,7 +395,7 @@ Volcano plots enable us to visualise **significance** of expression (logCPM) ver
 # volcanoplot, minimal
 counts.de %>%
   filter(lowly_abundant == FALSE) %>%
-  ggplot(aes(x=`logFC_conditionbpreg - conditionblact`, y=-log10(`PValue_conditionbpreg - conditionblact`), colour=`is_de_conditionbpreg - conditionblact`)) +
+  ggplot(aes(x=logFC, y=-log10(PValue), colour=is_de)) +
   geom_point()
 ```
 To see how to make more complicated volcano plots, including how to label genes in the plot, see the volcano plot tutorial [here](https://pmacdasci.github.io/r-intro-tidyverse/volcanoplot.html). More complicated MA plots could also be made in a similar way.
