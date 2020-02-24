@@ -1,5 +1,6 @@
 ---
 title: "Introduction to R for RNA-Seq"
+subtitle: "TidyTranscriptomics"
 author: "Maria Doyle, Stefano Mangiola"
 output:
   html_notebook:
@@ -76,7 +77,7 @@ devtools::install_github("stemangiola/tidyHeatmap")
 # Overview
  
 * Reading in tables of counts and metadata
-* Formatting the tables
+* Formatting the data
 * Filtering lowly expressed genes
 * Scaling of counts
 * Quality control plots
@@ -216,7 +217,8 @@ tidyBulk can automatically filter out lowly expressed genes. It uses the edgeR f
 
 ```{r}
 # Filtering out lowly abundant genes 
-counts.filt <- counts %>% filter_abundant(factor_of_interest = condition)
+counts.filt <- counts %>% 
+  filter_abundant(factor_of_interest = condition)
 
 # take a look
 counts.filt
@@ -233,8 +235,16 @@ counts.filt %>%
 ```
 These samples all look pretty similar, none are majorly different.
 
+We can count how many genes there are after filtering.
+```{r}
+counts.filt %>% 
+  select(gene_symbol) %>% 
+  n_distinct()
+```
+
 #### Exercise
 Adapt the code above to create a density plot of the counts before filtering lowly expressed genes. How does it compare it to the density plot above?
+Count how many genes there were before filtering.
 
 # Normalisation for sequencing depth and composition
 
@@ -335,12 +345,12 @@ counts.norm.variable %>%
 Now that we are happy that the data looks good, we can continue to testing for differentially expressed genes. We will use the `test_differential_abundance()` from tidyBulk which uses edgeR to perform the differential expression analysis. We give `test_differential_abundance()` our tidyBulk counts object and a formula, 
 specifying the column that contains our groups to be compared e.g. `0 + condition`. We can also provide the names of the groups we want to compare/contrast to .contrasts (e.g. .contrasts = c("conditionbpreg - conditionblact")). `test_differential_abundance()` will also perform the filtering of lowly expressed genes as described before. We will use `action="get"` rather than the default tidyBulk of `action="add"`, as we don't want to join the result to our counts for every sample. We just want a table of differentially expressed genes for the specified contrast. 
 ```{r}
-# Differential expression with limma-voom (or edgeR)
 counts.de <- counts %>%
     test_differential_abundance(
       .formula = ~ 0 + condition,
       .contrasts = c("conditionbpreg - conditionblact"),
       action="get")
+
 # take a look
 counts.de
 ```
@@ -351,7 +361,7 @@ Perform differential expression for lpreg vs llact. Don't save over `counts.de`,
 
 Perform for 2 contrasts, bpreg vs blact and lpreg vs llact at the same time. Don't save over `counts.de`, save as `counts.de3`.
 
-## Table of differentially expressed genes
+### Table of differentially expressed genes
 
 We can write out our differentialy expressed genes to a file that can be loaded into e.g. Excel. `write_tsv()` will create a tab-separated file.
 
@@ -368,17 +378,39 @@ counts.de <- counts.de %>%
             ~str_replace(., "_conditionbpreg - conditionblact", ""))
 ```
 
+### Counting differentially expressed genes
+
 We can count how many differentially expressed genes there are using the is_de column.
 
 ```{r}
-counts.de %>% filter(is_de == TRUE) %>% 
+counts.de %>% 
+  filter(is_de == TRUE) %>% 
   n_distinct()
 ```
 
 #### Exercise
-Count how many upregulated DE genes there are. 
+Count how many upregulated DE genes there are.  
 Count how many downregulated DE genes there are.
 
+### Extracting top differentially expressed genes
+
+We can get the top genes by P value with
+```{r}
+counts.de %>%
+	filter(is_de == TRUE) %>%
+	arrange(PValue) %>%
+	head(6)
+```	
+
+We can extract the symbols for these top genes with
+```{r}
+topgenes <- counts.de %>%
+	filter(is_de == TRUE) %>%
+	arrange(PValue) %>%
+	head(6) %>%
+  pull(gene_symbol)
+```
+	
 # Plots after testing for DE
 
 Let's make a few plots to make sure everything looks good and that we haven't made a mistake in the analysis. Genome-wide plots that are useful for checking are MA plots and volcano plots. We can also use stripcharts and heatmaps to visualise groups of genes.
@@ -411,18 +443,17 @@ To see how to make more complicated volcano plots, including how to label genes 
 
 In addition to the genome-wide plots already discussed, it is recommended to have a look at the expression levels of the individual samples for the genes of interest, before following up on the DE genes with further lab work. We can use stripcharts and heatmaps to do this. These will help show if expression is consistent amongst replicates in the groups.
 
-For these plots showing expression in the individual samples, we need the normalised counts per gene per sample, so we will first join the scaled counts to the de results.
-```{r}
-counts.de <- full_join(counts.de, counts.norm, by = "gene_symbol")
-```
 With stripcharts we can see if replicates tend to group together and how the expression compares to the other groups. 
-*Note this is bit more complicated maybe omit. Or break it into steps e.g. get top genes, then plot*
+
 
 ```{r}
-# stripcharts
-counts.de %>%
-	inner_join( (.) %>% distinct(gene_symbol, PValue) %>% arrange(PValue) %>% head(6)) %>%
-	ggplot(aes(x = condition, y = count_scaled + 1, colour = condition)) +
+# extract counts for top DE genes
+topgenes_counts <- counts.norm %>%
+  filter(gene_symbol %in% topgenes)
+
+# make stripchart
+topgenes_counts %>%
+  ggplot(aes(x = condition, y = count_scaled + 1, colour = condition)) +
 	geom_jitter() +
 	facet_wrap(~gene_symbol) +
   scale_y_log10()
@@ -431,6 +462,13 @@ counts.de %>%
 ### Heatmaps
 
 We can create heatmaps for the most differentially expressed genes. For example we could select the genes with FDR < 0.05 and a logFC change of 4 and make a heatmap of those.
+
+We will first join the scaled counts to the de results.
+```{r}
+counts.de <- full_join(counts.de, counts.norm, by = "gene_symbol")
+```
+
+Then we can create the heatmap selecting genes by applying filters for e.g. FDR and logFC.
 
 ```{r fig.height=5, fig.width=8}
 counts.de %>%
