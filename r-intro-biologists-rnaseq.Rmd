@@ -74,11 +74,12 @@ devtools::install_github("stemangiola/tidyHeatmap")
 
 
 # Overview
-
-TODO: Maybe add workflow image showing steps and functions used
  
 * Reading in tables of counts and metadata
-* Filtering and Normalisation of counts
+* Formatting the tables
+* Filtering lowly expressed genes
+* Scaling of counts
+* Quality control plots
 * Differential expression analysis
 * Visualisation (Heatmaps, MA plot, Volcano plot)
 
@@ -191,19 +192,14 @@ counts <- tidyBulk(counts, sample, gene_symbol, count)
 # take a look
 counts
 ```
-Some gene symbols are not unique, they map to more than one gene id. We need to remove this redundancy  and we can do that with tidyBulk function aggregate_duplicates(). By default it will aggregate duplicate gene symbols summing their counts. Add way to identify what the duplicates are?  
+Some gene symbols are not unique, they map to more than one gene id. We need to remove this redundancy and we can do that with tidyBulk function `aggregate_duplicates()`. By default it will aggregate duplicate gene symbols summing their counts. 
 
 ```{r}
 # get rid of duplicated gene symbols
 counts <- aggregate_duplicates(counts)
 ```
 
-
-# Filtering and Normalisation
-
-Before testing for differential expression we need to do some preprocessing of the data. We filter lowly expressed genes and also normalise for differences in sequencing depth and composition between the samples. These steps are explained in more details below.
-
-First we will check how many counts we have for each sample. We can do this quite easily by making a bar plot. This helps us see whether there are any major discrepancies between the samples more easily.
+We can check how many counts we have for each sample by making a bar plot. This helps us see whether there are any major discrepancies between the samples more easily.
 
 ```{r}
 # make barplot of counts
@@ -213,7 +209,7 @@ ggplot(counts, aes(x=sample, weight=count, fill=condition)) +
 
 The bar plots show us there are ~20 million counts per sample.
 
-### Filtering lowly expressed genes  
+# Filtering lowly expressed genes  
 Genes with very low counts across all libraries provide little evidence for differential expression and they interfere with some of the statistical approximations that are used later in the pipeline. They also add to the multiple testing burden when estimating false discovery rates, reducing power to detect differentially expressed genes. These genes should be filtered out prior to further analysis.
 
 tidyBulk can automatically filter out lowly expressed genes. It uses the edgeR filterByExpr function described [here](https://f1000research.com/articles/5-1408). This will keep genes with ~10 counts in a minimum number of samples, the number of the samples in the smallest group. In this dataset the smallest group size is 2 samples. tidyBulk performs this filtering in the functions we will use `scale_abundance()` and `test_differential_abundance()` and we can take a look at it with `filter_abundant()`.
@@ -235,18 +231,14 @@ counts.filt %>%
   geom_density() +
   scale_x_log10()
 ```
-
+These samples all look pretty similar, none are majorly different.
 
 #### Exercise
 Adapt the code above to create a density plot of the counts before filtering lowly expressed genes. How does it compare it to the density plot above?
 
-*Maybe add a way to see how many genes we have for each sample, before and after filtering?*
+# Normalisation for sequencing depth and composition
 
-### Normalisation for sequencing depth and composition
-
-TMM normalisation is performed to eliminate composition biases between libraries [@robinson2010tmm]. This generates a set of normalisation factors, where the product of these factors and the library sizes defines the effective library size. TMM normalisation (and most scaling normalisation methods) scale relative to one sample.
-
-In the tidyBulk package the function scale_abundance() generates scaled counts, it will also perform the filtering.
+TMM normalisation is performed to eliminate composition biases between libraries [@robinson2010tmm]. This generates a set of normalisation factors, where the product of these factors and the library sizes defines the effective library size. TMM normalisation (and most scaling normalisation methods) scale relative to one sample. In the tidyBulk package the function `scale_abundance()` generates scaled counts, it will also perform the filtering.
 
 ```{r}
 # Scaling counts for library size and composition bias
@@ -269,6 +261,7 @@ counts.norm %>%
   geom_hline(aes(yintercept = median(count_scaled + 1), colour = 'red')) +
   scale_y_log10()
 ```
+These samples all look pretty similar, none are majorly different.
 
 #### Exercise
 Adapt the code above to create box plots of the counts before scaling. How do they compare to the box plots above?
@@ -462,7 +455,7 @@ sessionInfo()
 - RNA-Seq data can be analysed in a 'tidy' way using the packages tidyverse, tidyBulk and tidyHeatmap
 - Key steps in an RNA-Seq analysis are filtering lowly expressed genes, normalisation for sequencing depth and composition, and testing for differential expression
 - MDS plots are very important for examining the quality of the data
-- Other useful plots for assessing RNA-Seq data are bar plots, density plots, box plots, MA plots, volcano plots, stripcharts and heatmaps
+- Other useful plots for assessing RNA-Seq data are bar plots, density plots, box plots, MA plots, volcano plots, stripcharts and heatmaps. These can all be made in a 'tidy' way.
 
 
 # Further Reading
