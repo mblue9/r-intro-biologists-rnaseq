@@ -11,6 +11,9 @@ date: "`r format(Sys.time(), '%d %B %Y')`"
 
 ## Acknowledgements
 This material is adapted from an R for RNA-Seq workshop first run [here](http://combine-australia.github.io/2016-05-11-RNAseq/).
+
+## Prerequisites
+This course assumes some basic familiarity with RStudio and tidyverse, for example, the content covered [here](https://mblue9.github.io/r-intro-biologists/intro_r_biologists.html).
   
 # R for RNA-Seq course
   
@@ -59,7 +62,7 @@ install.packages(c("tidyverse", "devtools"))
 ```
 
 ### GitHub packages
-tidyBulk will be added to Bioconductor and when it is added there you can install it using the usual Bioconductor commands. tidyHeatmap will be added to CRAN and when it is there you can install it with the install.packages() command. In the meantime you can install tidyBulk and tidyHeatmap from their development sites in Github with the commands below.
+tidyBulk will be added to Bioconductor and when it is added there you can install it using the usual Bioconductor commands. tidyHeatmap will be added to CRAN and when it is there you can install it with the `install.packages()` command. In the meantime you can install tidyBulk and tidyHeatmap from their development sites in GitHub with the commands below.
 
 ```{r, eval=FALSE}
 # install tidyBulk
