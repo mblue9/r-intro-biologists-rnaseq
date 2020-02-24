@@ -255,7 +255,7 @@ counts.norm
 
 After we run `scale_abundance()` we should see some columns have been added at the end. We have a column called `lowly_abundant` that indicates whether the gene has been filtered due to being lowly expressed. FALSE means the gene wasn’t filtered, TRUE means it was. The `count_scaled` column contains the scaled counts.
 
-We can also create box plots to check the distributions of the counts in the samples. We can add a line through the median to help us see how similar (or not) the distributions are.
+We can also create box plots to check the distributions of the counts in the samples. We can add a line through the median with to help us see how similar (or not) the distributions are.
 
 ```{r}
 # box plot after scaling
@@ -437,7 +437,6 @@ counts.de %>%
 We can create heatmaps for the most differentially expressed genes. For example we could select the genes with FDR < 0.05 and a logFC change of 4 and make a heatmap of those.
 
 ```{r fig.height=5, fig.width=8}
-# basic
 counts.de %>%
   filter(FDR < 0.05 & abs(logFC) > 4) %>%
   heatmap(
@@ -446,20 +445,6 @@ counts.de %>%
         .abundance = count_scaled,
         annotation = c(immunophenotype, `developmental stage`),
         log_transform = TRUE
-    )
-```
-```{r fig.height=5, fig.width=8}
-# customised
-counts.de %>%
-  filter(FDR < 0.05 & abs(logFC) > 4) %>%
-  heatmap(
-        .horizontal = sample,
-        .vertical = gene_symbol,
-        .abundance = count_scaled,
-        annotation = c(immunophenotype, `developmental stage`),
-        log_transform = TRUE,
-        palette_abundance = c("blue", "white", "red"),
-        column_names_gp = gpar(fontsize = 8)
     )
 ```
 
