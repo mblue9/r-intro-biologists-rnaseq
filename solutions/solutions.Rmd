@@ -4,27 +4,28 @@ output: html_notebook
 ---
 
 #### Exercise
-Adapt the code above to create a density plot of the counts after filtering lowly expressed genes. How does it compare it to the density plot above?
+Adapt the code above to create a density plot of the counts before filtering lowly expressed genes. How does it compare it to the density plot above?
 
 ```{r}
-# Solution
-counts.norm %>% 
-  filter(lowly_abundant == FALSE) %>%
-  ggplot(aes(x=count_scaled + 1, group=sample, color=condition)) +
+# density plot before 
+counts %>% 
+  ggplot(aes(x=count + 1, group=sample, color=condition)) +
   geom_density() +
   scale_x_log10()
 ```
 
+The large peak on the left of the plot shows that a large proportion of genes within each sample are not expressed or lowly-expressed.
+
 #### Exercise
-Adapt the code above to create box plots that only includes the genes that have not been filtered due to low counts. How does it compare it to the box plots above?
+Adapt the code above to create box plots of the counts before scaling. How do they compare to the box plots above?
 
 ```{r}
-# box plot after filtering
+# box plot before scaling
 counts.norm %>% 
   filter(lowly_abundant == FALSE) %>%
-  ggplot(aes(x=sample, y=count_scaled + 1, fill=condition)) +
+  ggplot(aes(x=sample, y=count + 1, fill=condition)) +
   geom_boxplot() +
-  geom_hline(aes(yintercept = median(count_scaled + 1), colour = 'red')) +
+  geom_hline(aes(yintercept = median(count + 1), colour = 'red')) +
   scale_y_log10()
 ```
 
