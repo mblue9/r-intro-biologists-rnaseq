@@ -59,18 +59,14 @@ BiocManager::install("edgeR")
 ### CRAN packages
 Install the CRAN packages with the command below.
 ```{r, eval=FALSE}
-install.packages(c("tidyverse", "devtools"))
+install.packages(c("tidyverse", "tidyHeatmap", "devtools"))
 ```
 
 ### GitHub packages
-tidybulk will be added to Bioconductor and when it is added there you can install it using the usual Bioconductor commands. tidyHeatmap will be added to CRAN and when it is there you can install it with the `install.packages()` command. In the meantime you can install tidybulk and tidyHeatmap from their development sites in GitHub with the commands below.
+tidybulk will be added to Bioconductor and when it is added there you can install it using the usual Bioconductor commands. In the meantime you can install tidybulk from its development site in GitHub with the commands below.
 
 ```{r, eval=FALSE}
-# install tidybulk
 devtools::install_github("stemangiola/tidybulk@dev")
-
-# install tidyHeatmap
-devtools::install_github("stemangiola/tidyHeatmap")
 ```
 
 
