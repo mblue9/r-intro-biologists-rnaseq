@@ -18,9 +18,9 @@ This course assumes some basic familiarity with RStudio and tidyverse, for examp
   
 # R for RNA-Seq course
   
-This course has been designed to introduce biologists to R for RNA-Seq analysis. The focus here is on using tidyverse to analyse RNA-Seq data, as we believe this is a productive and engaging way to learn R for RNA-Seq analysis. In this course we will use some new packages, [**tidyBulk**]([https://github.com/stemangiola/tidyBulk) and [**tidyHeatmap**](https://github.com/stemangiola/tidyHeatmap). These packages provide a friendly tidyverse-style way to perform analysis of RNA-Seq data.
+This course has been designed to introduce biologists to R for RNA-Seq analysis. The focus here is on using tidyverse to analyse RNA-Seq data, as we believe this is a productive and engaging way to learn R for RNA-Seq analysis. In this course we will use some new packages, [**tidybulk**]([https://github.com/stemangiola/tidybulk) and [**tidyHeatmap**](https://github.com/stemangiola/tidyHeatmap). These packages provide a friendly tidyverse-style way to perform analysis of RNA-Seq data.
 
-![](images/tidyBulk_logo.png){width=25% }
+![](images/tidybulk_logo.png){width=25% }
 
 # Setup
 
@@ -38,7 +38,7 @@ Data files:
 Packages used:
 
 * tidyverse
-* tidyBulk
+* tidybulk
 * tidyHeatmap
 * edgeR
 * devtools
@@ -46,7 +46,7 @@ Packages used:
 Here we will use packages from the 3 main repositories of R packages: Bioconductor, CRAN and GitHub. To install the packages you can follow the steps below.
 
 ### R version
-* [Install R >= 3.6](https://bioconductor.org/install/#install-R). **You must have R >= 3.6 to use tidyBulk and tidyHeatmap.**
+* [Install R >= 3.6](https://bioconductor.org/install/#install-R). **You must have R >= 3.6 to use tidybulk and tidyHeatmap.**
 
 ### Bioconductor packages
 * Get the latest version of Bioconductor and edgeR package by starting R and entering the commands:
@@ -63,11 +63,11 @@ install.packages(c("tidyverse", "devtools"))
 ```
 
 ### GitHub packages
-tidyBulk will be added to Bioconductor and when it is added there you can install it using the usual Bioconductor commands. tidyHeatmap will be added to CRAN and when it is there you can install it with the `install.packages()` command. In the meantime you can install tidyBulk and tidyHeatmap from their development sites in GitHub with the commands below.
+tidybulk will be added to Bioconductor and when it is added there you can install it using the usual Bioconductor commands. tidyHeatmap will be added to CRAN and when it is there you can install it with the `install.packages()` command. In the meantime you can install tidybulk and tidyHeatmap from their development sites in GitHub with the commands below.
 
 ```{r, eval=FALSE}
-# install tidyBulk
-devtools::install_github("stemangiola/tidyBulk@dev")
+# install tidybulk
+devtools::install_github("stemangiola/tidybulk@dev")
 
 # install tidyHeatmap
 devtools::install_github("stemangiola/tidyHeatmap")
@@ -95,7 +95,7 @@ First, let’s load all the packages we will need to analyse the data.
 ```{r , message=FALSE, warning=FALSE}
 # load libraries
 library(tidyverse)
-library(tidyBulk)
+library(tidybulk)
 library(tidyHeatmap)
 ```
 
@@ -185,15 +185,15 @@ counts <- counts %>%
   mutate(sample=str_remove(sample, "GSM1480"))
 ```
 
-Now that we have our data in the format we want we will create a tidyBulk object, that we can use to perform differential expression analysis with the tidyBulk package. For this we need to specify our counts object and the names of the columns that contain our sample ids, our gene identifiers and our counts. Any other columns in the counts object e.g. our Ensembl gene id "X1" column will remain at the end.
+Now that we have our data in the format we want we will create a tidybulk object, that we can use to perform differential expression analysis with the tidybulk package. For this we need to specify our counts object and the names of the columns that contain our sample ids, our gene identifiers and our counts. Any other columns in the counts object e.g. our Ensembl gene id "X1" column will remain at the end.
 ```{r}
 #create a 'tt' object
-counts <- tidyBulk(counts, sample, gene_symbol, count)
+counts <- tidybulk(counts, sample, gene_symbol, count)
 
 # take a look
 counts
 ```
-Some gene symbols are not unique, they map to more than one gene id. We need to remove this redundancy and we can do that with tidyBulk function `aggregate_duplicates()`. By default it will aggregate duplicate gene symbols summing their counts. 
+Some gene symbols are not unique, they map to more than one gene id. We need to remove this redundancy and we can do that with tidybulk function `aggregate_duplicates()`. By default it will aggregate duplicate gene symbols summing their counts. 
 
 ```{r}
 # get rid of duplicated gene symbols
@@ -213,12 +213,12 @@ The bar plots show us there are ~20 million counts per sample.
 # Filtering lowly expressed genes  
 Genes with very low counts across all libraries provide little evidence for differential expression and they interfere with some of the statistical approximations that are used later in the pipeline. They also add to the multiple testing burden when estimating false discovery rates, reducing power to detect differentially expressed genes. These genes should be filtered out prior to further analysis.
 
-tidyBulk can automatically filter out lowly expressed genes. It uses the edgeR filterByExpr function described [here](https://f1000research.com/articles/5-1408). This will keep genes with ~10 counts in a minimum number of samples, the number of the samples in the smallest group. In this dataset the smallest group size is 2 samples. tidyBulk performs this filtering in the functions we will use `scale_abundance()` and `test_differential_abundance()` and we can take a look at it with `filter_abundant()`.
+tidybulk can automatically filter out lowly expressed genes. It uses the edgeR filterByExpr function described [here](https://f1000research.com/articles/5-1408). This will keep genes with ~10 counts in a minimum number of samples, the number of the samples in the smallest group. In this dataset the smallest group size is 2 samples. tidybulk performs this filtering in the functions we will use `scale_abundance()` and `test_differential_abundance()` and we can take a look at it with `keep_abundant()`.
 
 ```{r}
 # Filtering out lowly abundant genes 
 counts.filt <- counts %>% 
-  filter_abundant(factor_of_interest = condition)
+  keep_abundant(factor_of_interest = condition)
 
 # take a look
 counts.filt
@@ -248,7 +248,7 @@ Count how many genes there were before filtering.
 
 # Normalisation for sequencing depth and composition
 
-TMM normalisation is performed to eliminate composition biases between libraries [@robinson2010tmm]. This generates a set of normalisation factors, where the product of these factors and the library sizes defines the effective library size. TMM normalisation (and most scaling normalisation methods) scale relative to one sample. In the tidyBulk package the function `scale_abundance()` generates scaled counts, it will also perform the filtering.
+TMM normalisation is performed to eliminate composition biases between libraries [@robinson2010tmm]. This generates a set of normalisation factors, where the product of these factors and the library sizes defines the effective library size. TMM normalisation (and most scaling normalisation methods) scale relative to one sample. In the tidybulk package the function `scale_abundance()` generates scaled counts, it will also perform the filtering.
 
 ```{r}
 # Scaling counts for library size and composition bias
@@ -322,12 +322,12 @@ Demo more MDS plots (sample swap, batch effects)
 
 # Hierarchical clustering with heatmaps
 
-An alternative to MDS for examining relationships between samples is using hierarchical clustering. Heatmaps are a nice visualisation to examine hierarchical clustering of your samples. tidyBulk has a simple function we can use to extract the 500 most variable genes which we can then plot with tidyHeatmap.
+An alternative to MDS for examining relationships between samples is using hierarchical clustering. Heatmaps are a nice visualisation to examine hierarchical clustering of your samples. tidybulk has a simple function we can use to extract the 500 most variable genes which we can then plot with tidyHeatmap.
 
 ```{r fig.height=5, fig.width=8}
 # extract 500 most variable genes
 counts.norm.variable <- counts.norm %>% 
-  filter_variable()
+  keep_variable()
 
 # create heatmap
 counts.norm.variable %>%
@@ -342,8 +342,8 @@ counts.norm.variable %>%
 
 # Differential expression
 
-Now that we are happy that the data looks good, we can continue to testing for differentially expressed genes. We will use the `test_differential_abundance()` from tidyBulk which uses edgeR to perform the differential expression analysis. We give `test_differential_abundance()` our tidyBulk counts object and a formula, 
-specifying the column that contains our groups to be compared e.g. `0 + condition`. We can also provide the names of the groups we want to compare/contrast to .contrasts (e.g. .contrasts = c("conditionbpreg - conditionblact")). `test_differential_abundance()` will also perform the filtering of lowly expressed genes as described before. We will use `action="get"` rather than the default tidyBulk of `action="add"`, as we don't want to join the result to our counts for every sample. We just want a table of differentially expressed genes for the specified contrast. 
+Now that we are happy that the data looks good, we can continue to testing for differentially expressed genes. We will use the `test_differential_abundance()` from tidybulk which uses edgeR to perform the differential expression analysis. We give `test_differential_abundance()` our tidybulk counts object and a formula, 
+specifying the column that contains our groups to be compared e.g. `0 + condition`. We can also provide the names of the groups we want to compare/contrast to .contrasts (e.g. .contrasts = c("conditionbpreg - conditionblact")). `test_differential_abundance()` will also perform the filtering of lowly expressed genes as described before. We will use `action="get"` rather than the default tidybulk of `action="add"`, as we don't want to join the result to our counts for every sample. We just want a table of differentially expressed genes for the specified contrast. 
 ```{r}
 counts.de <- counts %>%
     test_differential_abundance(
@@ -490,7 +490,7 @@ sessionInfo()
 ```
 
 # Key Points
-- RNA-Seq data can be analysed in a 'tidy' way using the packages tidyverse, tidyBulk and tidyHeatmap
+- RNA-Seq data can be analysed in a 'tidy' way using the packages tidyverse, tidybulk and tidyHeatmap
 - Key steps in an RNA-Seq analysis are filtering lowly expressed genes, normalisation for sequencing depth and composition, and testing for differential expression
 - MDS plots are very important for examining the quality of the data
 - Other useful plots for assessing RNA-Seq data are bar plots, density plots, box plots, MA plots, volcano plots, stripcharts and heatmaps. These can all be made in a 'tidy' way.
