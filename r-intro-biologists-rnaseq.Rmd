@@ -272,7 +272,9 @@ These samples all look pretty similar, none are majorly different.
 #### Exercise
 Adapt the code above to create box plots of the counts before scaling. How do they compare to the box plots above?
 
-# Multidimensional scaling plots
+# Quality control
+
+## Multidimensional scaling plots
 
 By far, one of the most important plots we make when we analyse RNA-Seq data are MDS plots. An MDS plot is a visualisation of a principal components analysis, which determines the greatest sources of variation in the data. A principal components analysis is an example of an unsupervised analysis, where we don't need to specify the groups. If your experiment is well controlled and has worked well, what we hope to see is that the greatest sources of variation in the data are the treatments/groups we are interested in. It is also an incredibly useful tool for quality control and checking for outliers. We can use the `reduce_dimensions()` function to calculate the dimensions.
 
@@ -316,7 +318,7 @@ Discuss what is the greatest source of variation in the data (i.e. what does dim
 
 Demo more MDS plots (sample swap, batch effects)
 
-# Hierarchical clustering with heatmaps
+## Hierarchical clustering with heatmaps
 
 An alternative to MDS for examining relationships between samples is using hierarchical clustering. Heatmaps are a nice visualisation to examine hierarchical clustering of your samples. tidybulk has a simple function we can use to extract the 500 most variable genes which we can then plot with tidyHeatmap.
 
