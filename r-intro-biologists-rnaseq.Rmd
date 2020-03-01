@@ -350,7 +350,7 @@ counts.de <- counts %>%
 # take a look
 counts.de
 ```
-Now we have columns with our logFC and FDR P values. There is also an is_de column that indicates if the gene has FDR < 0.05.
+Now we have columns with our logFC and FDR P values. There is also a column called significant that indicates if the gene has FDR < 0.05.
 
 #### Exercise
 Perform differential expression for lpreg vs llact. Don't save over `counts.de`, save as `counts.de2`.
@@ -376,11 +376,11 @@ counts.de <- counts.de %>%
 
 ### Counting differentially expressed genes
 
-We can count how many differentially expressed genes there are using the is_de column.
+We can count how many differentially expressed genes there are using the significant column.
 
 ```{r}
 counts.de %>% 
-  filter(is_de == TRUE) %>% 
+  filter(significant == TRUE) %>% 
   n_distinct()
 ```
 
@@ -393,7 +393,7 @@ Count how many downregulated DE genes there are.
 We can get the top genes by P value with
 ```{r}
 counts.de %>%
-	filter(is_de == TRUE) %>%
+	filter(significant == TRUE) %>%
 	arrange(PValue) %>%
 	head(6)
 ```	
@@ -401,7 +401,7 @@ counts.de %>%
 We can extract the symbols for these top genes with
 ```{r}
 topgenes <- counts.de %>%
-	filter(is_de == TRUE) %>%
+	filter(significant == TRUE) %>%
 	arrange(PValue) %>%
 	head(6) %>%
   pull(gene_symbol)
@@ -419,7 +419,7 @@ MA plots enable us to visualise **amount** of expression (logCPM) versus logFC. 
 # maplot, minimal
 counts.de %>%
   filter(lowly_abundant == FALSE) %>%
-  ggplot(aes(x=logCPM, y=-logFC, colour=is_de)) +
+  ggplot(aes(x=logCPM, y=-logFC, colour=significant)) +
   geom_point()
 ```
 ### Volcano plots
@@ -430,7 +430,7 @@ Volcano plots enable us to visualise **significance** of expression (logCPM) ver
 # volcanoplot, minimal
 counts.de %>%
   filter(lowly_abundant == FALSE) %>%
-  ggplot(aes(x=logFC, y=-log10(PValue), colour=is_de)) +
+  ggplot(aes(x=logFC, y=-log10(PValue), colour=significant)) +
   geom_point()
 ```
 To see how to make more complicated volcano plots, including how to label genes in the plot, see the volcano plot tutorial [here](https://pmacdasci.github.io/r-intro-tidyverse/volcanoplot.html). More complicated MA plots could also be made in a similar way.
